@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "@progress/kendo-theme-default/dist/all.css";
-import { process } from "@progress/kendo-data-query";
 import { Grid, GridColumn } from "@progress/kendo-react-grid";
+import { orderBy } from "@progress/kendo-data-query";
 import axios from "axios";
 import "./App.css";
 import { Notification } from "@progress/kendo-react-notification";
-import { RadioButton } from "@progress/kendo-react-inputs";
 import useDidUpdeteEffect from "./hooks/useDidUpdeteEffect";
+import { RESPONSE_URL } from "../src/constants/responseURL";
 
 interface IUser {
   id: number;
@@ -16,6 +16,30 @@ interface IUser {
   enabled: boolean;
 }
 
+interface ISort {
+  dir: "asc" | "desc" | undefined;
+  field: string;
+}
+interface IUknown {
+  [key: string]: any;
+}
+interface IPagination {
+  skip: number;
+  take: number;
+}
+
+const initialSort: ISort[] = [
+  {
+    dir: "asc",
+    field: "username",
+  },
+];
+
+const initialDataState: IPagination = {
+  skip: 0,
+  take: 10,
+};
+
 const EnabledCell = (props: any) => {
   return <td>{props.dataItem[props.field] ? "Yes" : "No"}</td>;
 };
@@ -23,7 +47,8 @@ const EnabledCell = (props: any) => {
 const DatedCell = (props: any) => {
   const date: Date = new Date(props.dataItem[props.field]);
   const arrDate = date.toString().split(" ");
-  const stringDate: string = `${arrDate[1]} ${arrDate[2]} ${arrDate[3]}`;
+  const [dayWeek, month, day, year] = arrDate;
+  const stringDate: string = `${month} ${day} ${year}`;
   return <td>{stringDate}</td>;
 };
 
@@ -42,81 +67,29 @@ function App() {
 
   const [users, setUsers] = useState<IUser[] | []>([]);
   useEffect(() => {
-    responseAndDispalyUsers("http://localhost:3000/users");
+    responseAndDispalyUsers(`${RESPONSE_URL}/users`);
   }, []);
 
-  const [activeFilter, setActiveFilter] = useState("without");
-  const changeActiveFilter = (filter: string) => () => setActiveFilter(filter);
-
-  useDidUpdeteEffect(() => {
-    switch (activeFilter) {
-      case "without":
-        responseAndDispalyUsers("http://localhost:3000/users");
-        break;
-      case "username":
-        responseAndDispalyUsers(
-          "http://localhost:3000/users?_sort=username&order=desc"
-        );
-        break;
-      case "full_name":
-        responseAndDispalyUsers(
-          "http://localhost:3000/users?_sort=full_name&order=desc"
-        );
-        break;
-      case "last_login":
-        responseAndDispalyUsers(
-          "http://localhost:3000/users?_sort=last_login&order=desc"
-        );
-        break;
-      case "enabled":
-        responseAndDispalyUsers(
-          "http://localhost:3000/users?_sort=enabled&order=asc"
-        );
-    }
-  }, [activeFilter]);
-
-  const radiosData = [
-    {
-      label: "Without a filter",
-      value: "without",
-    },
-    {
-      label: "By username",
-      value: "username",
-    },
-    {
-      label: "By full name",
-      value: "full_name",
-    },
-    {
-      label: "By last login",
-      value: "last_login",
-    },
-    {
-      label: "By enabled",
-      value: "enabled",
-    },
-  ];
+  const [sort, setSort] = useState<ISort[]>(initialSort);
+  const [page, setPage] = React.useState<IPagination>(initialDataState);
+  const pageChange = (event: IUknown) => {
+    setPage(event.page);
+  };
   return (
     <div className="App">
       <div className="wrapp">
         <h2>User List</h2>
-        <div className="filters">
-          <p>Filter:</p>
-          {radiosData.map((el) => (
-            <div style={{ marginBottom: "10px" }}>
-              <RadioButton
-                name="filter"
-                value={el.value}
-                checked={activeFilter === el.value}
-                label={el.label}
-                onChange={changeActiveFilter(el.value)}
-              />
-              <br />
-            </div>
-          ))}
-        </div>
-        <Grid data={users} style={{ width: "100%" }}>
+        <Grid
+          data={orderBy(users, sort)}
+          style={{ width: "100%" }}
+          sortable={true}
+          sort={sort}
+          pageable={true}
+          pageSize={10}
+          onSortChange={(e: IUknown) => {
+            setSort(e.sort);
+          }}
+        >
           <GridColumn width="250px" field="username" title="Username" />
           <GridColumn width="250px" field="full_name" title="Full name" />
           <GridColumn
