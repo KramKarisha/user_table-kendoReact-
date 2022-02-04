@@ -3,6 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@progress/kendo-data-query": "^1.5.5",
+    "@progress/kendo-drawing": "^1.16.2",
+    "@progress/kendo-licensing": "^1.2.1",
+    "@progress/kendo-react-animation": "^5.0.1",
+    "@progress/kendo-react-data-tools": "^5.0.1",
+    "@progress/kendo-react-dateinputs": "^5.0.1",
+    "@progress/kendo-react-dropdowns": "^5.0.1",
+    "@progress/kendo-react-grid": "^5.0.1",
+    "@progress/kendo-react-inputs": "^5.0.1",
+    "@progress/kendo-react-intl": "^5.0.1",
+    "@progress/kendo-react-notification": "^5.0.1",
+    "@progress/kendo-react-treeview": "^5.0.1",
+    "@progress/kendo-theme-default": "^5.1.1",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
@@ -10,6 +23,8 @@
     "@types/node": "^16.11.22",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
+    "axios": "^0.25.0",
+    "json-server": "^0.17.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "5.0.0",
@@ -20,7 +35,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "json-server --watch db.json"
   },
   "eslintConfig": {
     "extends": [
